@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Do Not Disturb Tiles</string>
+    <string name="silence_tile_label">Total silence</string>
+    <string name="alarms_tile_label">Alarms only</string>
+    <string name="priority_tile_label">Priority only</string>
+    <string name="policy_control_disabled">Do Not Disturb access is necessary for proper tile function. Enable this setting, then add a tile from the Edit interface.</string>
+    <string name="policy_control_enabled">Setup complete. To use a tile, add it from the Edit interface.</string>
+    <string name="go_button">Go</string>
+    <string name="do_not_disturb_access">Do not disturb access:</string>
+    <string name="disabled">Disabled</string>
+    <string name="enabled">Enabled</string>
+</resources>
