@@ -1,7 +1,6 @@
 package com.bskup.donotdisturbtiles;
 
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,10 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-import android.support.annotation.IntDef;
 import android.util.Log;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Created on 9/21/2016.
