@@ -15,6 +15,8 @@ import android.util.Log;
  */
 public class AlarmsTileService extends TileService {
 
+    private NotificationManager mNotificationManager;
+
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -70,8 +72,19 @@ public class AlarmsTileService extends TileService {
 
     @Override
     public void onClick() {
-        super.onClick();
-        toggleAlarmsTile();
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (mNotificationManager.isNotificationPolicyAccessGranted()) {
+            super.onClick();
+            toggleAlarmsTile();
+        } else {
+            Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(closeIntent);
+            Log.v("AlarmsTileService", "close system dialogs intent sent");
+            Intent intent = new Intent(this, MainActivity.class);
+            Log.v("AlarmsTileService", "open MainActivity intent sent");
+            startActivity(intent);
+            setAlarmsIconToMatchCurrentState();
+        }
     }
 
     // Helper method to check and update tile and toggle do not disturb state

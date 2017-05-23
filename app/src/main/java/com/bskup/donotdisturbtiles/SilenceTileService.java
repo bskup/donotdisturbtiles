@@ -3,17 +3,21 @@ package com.bskup.donotdisturbtiles;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Icon;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 /**
  * Created on 9/21/2016.
  */
 public class SilenceTileService extends TileService {
+
+    private NotificationManager mNotificationManager;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -48,8 +52,6 @@ public class SilenceTileService extends TileService {
     public void onTileAdded() {
         super.onTileAdded();
         Log.v("SilenceTileService", "onTileAdded called");
-
-        setSilenceIconToMatchCurrentState();
     }
 
     @Override
@@ -73,8 +75,20 @@ public class SilenceTileService extends TileService {
 
     @Override
     public void onClick() {
-        super.onClick();
-        toggleSilenceTile();
+        Log.v("SilenceTileService", "tile clicked");
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (mNotificationManager.isNotificationPolicyAccessGranted()) {
+            super.onClick();
+            toggleSilenceTile();
+        } else {
+            Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(closeIntent);
+            Log.v("SilenceTileService", "close system dialogs intent sent");
+            Intent intent = new Intent(this, MainActivity.class);
+            Log.v("SilenceTileService", "open MainActivity intent sent");
+            startActivity(intent);
+            setSilenceIconToMatchCurrentState();
+        }
     }
 
     // Helper method to check and update tile and toggle do not disturb state

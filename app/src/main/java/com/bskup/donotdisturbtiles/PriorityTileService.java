@@ -15,6 +15,8 @@ import android.util.Log;
  */
 public class PriorityTileService extends TileService {
 
+    private NotificationManager mNotificationManager;
+
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -70,8 +72,19 @@ public class PriorityTileService extends TileService {
 
     @Override
     public void onClick() {
-        super.onClick();
-        togglePriorityTile();
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (mNotificationManager.isNotificationPolicyAccessGranted()) {
+            super.onClick();
+            togglePriorityTile();
+        } else {
+            Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(closeIntent);
+            Log.v("PriorityTileService", "close system dialogs intent sent");
+            Intent intent = new Intent(this, MainActivity.class);
+            Log.v("PriorityTileService", "open MainActivity intent sent");
+            startActivity(intent);
+            setPriorityIconToMatchCurrentState();
+        }
     }
 
     // Helper method to check and update tile and toggle do not disturb state
