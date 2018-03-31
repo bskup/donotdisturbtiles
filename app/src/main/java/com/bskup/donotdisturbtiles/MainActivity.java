@@ -48,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
         // Get support action bar corresponding to this toolbar
         ActionBar myActionBar = getSupportActionBar();
         // Turn on the title of that action bar
-        myActionBar.setDisplayShowTitleEnabled(true);
+        if (myActionBar != null) {
+            myActionBar.setDisplayShowTitleEnabled(true);
+        }
     }
 
     @Override

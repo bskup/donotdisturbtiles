@@ -24,7 +24,7 @@ public class SilenceTileService extends TileService {
         public void onReceive(Context context, Intent intent) {
             Log.v("SilenceTileService", "onReceive called");
             String action = intent.getAction();
-            if(action.equals("android.app.action.INTERRUPTION_FILTER_CHANGED")){
+            if (action != null && action.equals("android.app.action.INTERRUPTION_FILTER_CHANGED")) {
                 // Do this when notification policy changed
                 setSilenceIconToMatchCurrentState();
             }
@@ -77,17 +77,19 @@ public class SilenceTileService extends TileService {
     public void onClick() {
         Log.v("SilenceTileService", "tile clicked");
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (mNotificationManager.isNotificationPolicyAccessGranted()) {
-            super.onClick();
-            toggleSilenceTile();
-        } else {
-            Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-            sendBroadcast(closeIntent);
-            Log.v("SilenceTileService", "close system dialogs intent sent");
-            Intent intent = new Intent(this, MainActivity.class);
-            Log.v("SilenceTileService", "open MainActivity intent sent");
-            startActivity(intent);
-            setSilenceIconToMatchCurrentState();
+        if (mNotificationManager != null) {
+            if (mNotificationManager.isNotificationPolicyAccessGranted()) {
+                super.onClick();
+                toggleSilenceTile();
+            } else {
+                Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                sendBroadcast(closeIntent);
+                Log.v("SilenceTileService", "close system dialogs intent sent");
+                Intent intent = new Intent(this, MainActivity.class);
+                Log.v("SilenceTileService", "open MainActivity intent sent");
+                startActivity(intent);
+                setSilenceIconToMatchCurrentState();
+            }
         }
     }
 
@@ -97,11 +99,16 @@ public class SilenceTileService extends TileService {
         Tile tile = getQsTile();
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Log.v("SilenceTileService", "toggleSilenceTile called");
-        int currentDoNotDisturbStatus = nm.getCurrentInterruptionFilter();
+        int currentDoNotDisturbStatus = 0;
+        if (nm != null) {
+            currentDoNotDisturbStatus = nm.getCurrentInterruptionFilter();
+        }
         // If Total Silence is off, turn it on
         if (currentDoNotDisturbStatus != NotificationManager.INTERRUPTION_FILTER_NONE) {
 
-            nm.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);
+            if (nm != null) {
+                nm.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);
+            }
             Log.v("SilenceTileService", "set interruption filter to INTERRUPTION_FILTER_NONE - none get through");
 
             icon = Icon.createWithResource(getApplicationContext(), R.drawable.ic_dnd_total_silence);
@@ -125,7 +132,10 @@ public class SilenceTileService extends TileService {
         Tile tile = getQsTile();
         Icon icon;
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        int currentInterruptionFilter = nm.getCurrentInterruptionFilter();
+        int currentInterruptionFilter = 0;
+        if (nm != null) {
+            currentInterruptionFilter = nm.getCurrentInterruptionFilter();
+        }
         if (currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_NONE) {
             icon = Icon.createWithResource(getApplicationContext(), R.drawable.ic_qs_dnd_off);
             tile.setIcon(icon);

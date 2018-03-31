@@ -21,7 +21,7 @@ public class AlarmsTileService extends TileService {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if(action.equals("android.app.action.INTERRUPTION_FILTER_CHANGED")){
+            if (action != null && action.equals("android.app.action.INTERRUPTION_FILTER_CHANGED")) {
                 // Do this when notification policy changed
                 setAlarmsIconToMatchCurrentState();
             }
@@ -73,17 +73,19 @@ public class AlarmsTileService extends TileService {
     @Override
     public void onClick() {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (mNotificationManager.isNotificationPolicyAccessGranted()) {
-            super.onClick();
-            toggleAlarmsTile();
-        } else {
-            Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-            sendBroadcast(closeIntent);
-            Log.v("AlarmsTileService", "close system dialogs intent sent");
-            Intent intent = new Intent(this, MainActivity.class);
-            Log.v("AlarmsTileService", "open MainActivity intent sent");
-            startActivity(intent);
-            setAlarmsIconToMatchCurrentState();
+        if (mNotificationManager != null) {
+            if (mNotificationManager.isNotificationPolicyAccessGranted()) {
+                super.onClick();
+                toggleAlarmsTile();
+            } else {
+                Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                sendBroadcast(closeIntent);
+                Log.v("AlarmsTileService", "close system dialogs intent sent");
+                Intent intent = new Intent(this, MainActivity.class);
+                Log.v("AlarmsTileService", "open MainActivity intent sent");
+                startActivity(intent);
+                setAlarmsIconToMatchCurrentState();
+            }
         }
     }
 
@@ -93,10 +95,15 @@ public class AlarmsTileService extends TileService {
         Tile tile = getQsTile();
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Log.v("AlarmsTileService", "toggleAlarmsTile called");
-        int currentDoNotDisturbStatus = nm.getCurrentInterruptionFilter();
+        int currentDoNotDisturbStatus = 0;
+        if (nm != null) {
+            currentDoNotDisturbStatus = nm.getCurrentInterruptionFilter();
+        }
         // If Alarms Only is off, turn it on
         if (currentDoNotDisturbStatus != NotificationManager.INTERRUPTION_FILTER_ALARMS) {
-            nm.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALARMS);
+            if (nm != null) {
+                nm.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALARMS);
+            }
             Log.v("SilenceTileService", "set interruption filter to INTERRUPTION_FILTER_ALARMS - only Alarms get through");
 
             icon = Icon.createWithResource(getApplicationContext(), R.drawable.ic_qs_dnd_on);
@@ -120,7 +127,10 @@ public class AlarmsTileService extends TileService {
         Tile tile = getQsTile();
         Icon icon;
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        int currentInterruptionFilter = nm.getCurrentInterruptionFilter();
+        int currentInterruptionFilter = 0;
+        if (nm != null) {
+            currentInterruptionFilter = nm.getCurrentInterruptionFilter();
+        }
         if (currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALARMS) {
             icon = Icon.createWithResource(getApplicationContext(), R.drawable.ic_qs_dnd_off);
             tile.setIcon(icon);
